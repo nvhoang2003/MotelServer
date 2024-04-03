@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class AuthService implements UserDetailsService {
     private final UsersRepository userRepository;
-    public AuthService(UsersRepository userRepository, User userRepo) {
+    public AuthService(UsersRepository userRepository) {
         this.userRepository = userRepository;
     }
     @Override
