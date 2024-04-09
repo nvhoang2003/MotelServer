@@ -67,7 +67,6 @@ public class CommentsController {
             Comment comment = new Comment();
             comment.setContent(faker.lorem().sentence());
             comment.setCommentType(faker.lorem().word());
-            comment.setCommentValue(faker.lorem().word());
             comment.setIsDeleted(faker.number().numberBetween(0, 1)); // Assuming 0: Not Deleted, 1: Deleted
             if (!users.isEmpty()) {
                 comment.setCreatedBy(users.get(faker.number().numberBetween(0, users.size())));

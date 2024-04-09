@@ -25,6 +25,7 @@ public class JwtUntil {
 
     public String createToken(User user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
+        claims.put("userid",user.getId());
         claims.put("firstName",user.getFirstName());
         claims.put("lastName",user.getLastName());
         Date tokenCreateTime = new Date();

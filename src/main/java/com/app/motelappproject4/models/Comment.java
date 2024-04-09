@@ -1,3 +1,4 @@
+//Comment.java
 package com.app.motelappproject4.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -20,9 +21,14 @@ public class Comment {
 
     @Column(name = "comment_type")
     private String commentType;
+    // type: post, reply
 
     @Column(name = "comment_value")
-    private String commentValue;
+    private int commentValue;
+    /*
+    * If comment_type = "post" => comment_value = post_id
+    * If comment_type = "reply" => comment_value = comment_id (parent_comment_id)
+    * */
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
@@ -31,9 +37,7 @@ public class Comment {
     @Column(name = "is_deleted")
     private int isDeleted;
 
-
     // Getters and setters
-
     public int getId() {
         return id;
     }
@@ -58,11 +62,11 @@ public class Comment {
         this.commentType = commentType;
     }
 
-    public String getCommentValue() {
+    public int getCommentValue() {
         return commentValue;
     }
 
-    public void setCommentValue(String commentValue) {
+    public void setCommentValue(int commentValue) {
         this.commentValue = commentValue;
     }
 

@@ -1,11 +1,12 @@
 package com.app.motelappproject4.controllers.api;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.app.motelappproject4.models.User;
 import com.app.motelappproject4.models.UsersRepository;
 import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,9 @@ public class UsersController {
 
     @PostMapping("/api/users")
     public User create(@RequestBody User user) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
         return usersRepository.save(user);
     }
 
