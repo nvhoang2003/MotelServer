@@ -5,7 +5,7 @@ public class LoginRes {
     private String email;
     private String token;
 
-
+    public LoginRes(){}
     public LoginRes(int id,String email, String token) {
         this.id = id;
         this.email = email;

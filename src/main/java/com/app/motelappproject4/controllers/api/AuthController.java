@@ -26,6 +26,7 @@ public class AuthController {
     private AuthService authService;
     @Autowired
     private JwtUntil jwtUntil;
+    @Autowired
     private UsersRepository usersRepository;
 //    private final AuthenticationManager authenticationManager;
 //    public AuthController(AuthenticationManager authenticationManager, JwtUntil jwtUtil) {
@@ -58,8 +59,6 @@ public class AuthController {
     @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> login2(@RequestBody LoginReq loginReq) {
-        InitApp initApp = new InitApp();
-        initApp.adminUserInit();
         User user = usersRepository.findUserByEmail(loginReq.getEmail());
         if (user == null) {
             return ResponseEntity.badRequest().body("Email không tồn tại");
@@ -68,9 +67,27 @@ public class AuthController {
         if (!passwordEncoder.matches(loginReq.getPassword(), user.getPassword())) {
             return ResponseEntity.badRequest().body("Mật khẩu không chính xác");
         }
+        var token = jwtUntil.createToken(user);
+        LoginRes loginRes = new LoginRes(user.getId(), user.getEmail(), token );
 
-        System.out.println("Running!");
-        // Tạo và trả về token hoặc thông tin người dùng tại đây
-        return ResponseEntity.ok().body("Đăng nhập thành công");
+        return ResponseEntity.ok().body(loginRes);
+    }
+
+    @RequestMapping(value = "/regis", method = RequestMethod.POST)
+    public ResponseEntity<?> create(@RequestBody User user) {
+        User userExist = usersRepository.findUserByEmail(user.getEmail());
+        if (userExist != null) {
+            return ResponseEntity.badRequest().body("Email đã tồn tại");
+        }
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        try{
+            usersRepository.save(user);
+            return ResponseEntity.ok().body(user);
+        }catch (Exception ex){
+            return ResponseEntity.status(400).body(ex);
+        }
+
     }
 }

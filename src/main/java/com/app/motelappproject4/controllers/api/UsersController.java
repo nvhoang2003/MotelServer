@@ -27,14 +27,6 @@ public class UsersController {
         return usersRepository.findById(id);
     }
 
-    @PostMapping("/api/users")
-    public User create(@RequestBody User user) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        return usersRepository.save(user);
-    }
-
     @PutMapping("/api/users/{id}")
     public int update(@PathVariable int id, @RequestBody User updatedUser) {
         Optional<User> optionalUser = usersRepository.findById(id);
