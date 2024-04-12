@@ -1,6 +1,5 @@
 package com.app.motelappproject4.controllers.api;
 
-import com.app.motelappproject4.InitApp;
 import com.app.motelappproject4.auth.JwtUntil;
 import com.app.motelappproject4.models.User;
 import com.app.motelappproject4.dtos.LoginReq;
@@ -69,7 +68,6 @@ public class AuthController {
         }
         var token = jwtUntil.createToken(user);
         LoginRes loginRes = new LoginRes(user.getId(), user.getEmail(), token );
-
         return ResponseEntity.ok().body(loginRes);
     }
 

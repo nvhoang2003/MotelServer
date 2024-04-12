@@ -56,6 +56,7 @@ public class DistrictsController {
 
     @Autowired
     CityRepository cityRepository;
+
     @GetMapping("/api/seed/districts")
     public String seedDistrictsData() {
         Faker faker = new Faker();
@@ -72,5 +73,15 @@ public class DistrictsController {
             districtsRepository.save(district);
         }
         return "Seeded districts data with city associations";
+    }
+
+    // Test xem hàm đã hoạt động chuẩn chưa
+    @GetMapping("/rest/auth/api/districts/city/{cityId}")
+    public List<District> getDistrictsByCityId(@PathVariable int cityId) {
+        return districtsRepository.getListDistrictByCityId(cityId);
+    }
+    @GetMapping("/rest/auth/api/districts/city")
+    public List<District> getDistrictsByCityId() {
+        return districtsRepository.getListDistrictByCityId();
     }
 }

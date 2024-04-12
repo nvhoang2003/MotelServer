@@ -1,3 +1,4 @@
+// City.java
 package com.app.motelappproject4.models;
 
 
@@ -21,8 +22,8 @@ public class City {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "city")
-    private List<District> districts;
+//    @OneToMany(mappedBy = "city")
+//    private List<District> districts;
 
     public City(int id, String name) {
         this.id = id;
@@ -51,11 +52,11 @@ public class City {
         this.name = name;
     }
 
-    public List<District> getDistricts() {
-        return districts;
-    }
-
-    public void setDistricts(List<District> districts) {
-        this.districts = districts;
-    }
+//    public List<District> getDistricts() {
+//        return districts;
+//    }
+//
+//    public void setDistricts(List<District> districts) {
+//        this.districts = districts;
+//    }
 }
