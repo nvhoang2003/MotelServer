@@ -39,18 +39,7 @@ public class Motel {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "motel")
-    private List<PaymentHistory> paymentHistories;
     // Getters and setters
-
-    public List<PaymentHistory> getPaymentHistories() {
-        return paymentHistories;
-    }
-
-    public void setPaymentHistories(List<PaymentHistory> paymentHistories) {
-        this.paymentHistories = paymentHistories;
-    }
-
     public int getIsDeleted() {
         return isDeleted;
     }

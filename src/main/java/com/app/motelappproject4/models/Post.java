@@ -33,20 +33,11 @@ public class Post {
     @Column(name = "is_deleted")
     private int isDeleted;
 
-    @OneToMany(mappedBy = "post")
-    private List<Like> likes;
-
+    @ManyToOne
+    @JoinColumn(name = "district_id")
+    private District district;
 
     // Get and Set
-
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
-    }
 
     public int getId() {
         return id;
