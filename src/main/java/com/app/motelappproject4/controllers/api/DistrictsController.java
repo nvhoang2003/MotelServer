@@ -8,6 +8,7 @@ import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +17,15 @@ public class DistrictsController {
     @Autowired
     private DistrictsRepository districtsRepository;
 
-    @GetMapping("/api/districts")
-    public List<District> index() {
-        return (List<District>) districtsRepository.findAll();
+    @GetMapping("/api/districts/{cityId}")
+    public List<District> index(@PathVariable Integer cityId) {
+        List<District> listDistrict = new ArrayList<District>();
+        if(cityId == null){
+            listDistrict = (List<District>) districtsRepository.findAll();
+        }else{
+            listDistrict = (List<District>) districtsRepository.getListDistrictByCityId(cityId);
+        }
+        return listDistrict;
     }
 
     @GetMapping("/api/districts/{id}")
