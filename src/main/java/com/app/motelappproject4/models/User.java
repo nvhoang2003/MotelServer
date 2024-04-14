@@ -61,83 +61,9 @@ public class User {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "createdBy")
-    private List<Comment> comments;
-
-    @OneToMany(mappedBy = "createdBy")
-    private List<Post> posts;
-    @OneToMany(mappedBy = "user")
-    private List<Like> likes;
-
-    @OneToMany(mappedBy = "createdBy")
-    private List<PaymentHistory> paymentHistoriesCreatedBy;
-    @OneToMany(mappedBy = "tenant")
-    private List<PaymentHistory> paymentHistoriesTenant;
-    @OneToMany(mappedBy = "createdBy")
-    private List<Motel> motels;
-    @OneToMany(mappedBy = "user")
-    private List<UserRole> userRoles;
 
 
     // Getters and setters
-
-
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
-    }
-
-    public List<PaymentHistory> getPaymentHistoriesCreatedBy() {
-        return paymentHistoriesCreatedBy;
-    }
-
-    public void setPaymentHistoriesCreatedBy(List<PaymentHistory> paymentHistoriesCreatedBy) {
-        this.paymentHistoriesCreatedBy = paymentHistoriesCreatedBy;
-    }
-
-    public List<PaymentHistory> getPaymentHistoriesTenant() {
-        return paymentHistoriesTenant;
-    }
-
-    public void setPaymentHistoriesTenant(List<PaymentHistory> paymentHistoriesTenant) {
-        this.paymentHistoriesTenant = paymentHistoriesTenant;
-    }
-
-    public List<Motel> getMotels() {
-        return motels;
-    }
-
-    public void setMotels(List<Motel> motels) {
-        this.motels = motels;
-    }
-
-    public List<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<UserRole> userRoles) {
-        this.userRoles = userRoles;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     public int getId() {
         return id;
     }

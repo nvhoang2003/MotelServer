@@ -24,17 +24,8 @@ public class District {
     private City city;
 
 
-    @OneToMany(mappedBy = "district")
-    private List<Motel> motels;
+
     // Get and set
-
-    public List<Motel> getMotels() {
-        return motels;
-    }
-
-    public void setMotels(List<Motel> motels) {
-        this.motels = motels;
-    }
 
     public int getId() {
         return id;

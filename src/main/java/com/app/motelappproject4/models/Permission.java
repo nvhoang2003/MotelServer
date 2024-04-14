@@ -24,20 +24,7 @@ public class Permission {
 
     @Column(name = "is_deleted")
     private int isDeleted;
-
-    @OneToMany(mappedBy = "permission")
-    private List<RolePermission> rolePermissions;
-
     // Getters and setters
-
-
-    public List<RolePermission> getRolePermissions() {
-        return rolePermissions;
-    }
-
-    public void setRolePermissions(List<RolePermission> rolePermissions) {
-        this.rolePermissions = rolePermissions;
-    }
 
     public int getId() {
         return id;
