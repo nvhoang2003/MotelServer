@@ -1,4 +1,7 @@
 package com.app.motelappproject4.controllers.api;
+import com.app.motelappproject4.auth.JwtUntil;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.app.motelappproject4.models.User;
 import com.app.motelappproject4.models.UsersRepository;
@@ -17,9 +20,22 @@ public class UsersController {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private JwtUntil jwtUtil;
+
     @GetMapping("/api/users")
     public List<User> index() {
         return (List<User>) usersRepository.findAll();
+    }
+
+    @GetMapping("/api/users/getMyProfile")
+    public Optional<User> getMyProfile(HttpServletRequest request){
+        String accessToken = jwtUtil.resolveToken(request);
+        Claims claims = jwtUtil.resolveClaims(request);
+
+        Integer userId = claims.get("userid", Integer.class);
+        System.out.println(userId);
+        return usersRepository.findById(userId);
     }
 
     @GetMapping("/api/users/{id}")
