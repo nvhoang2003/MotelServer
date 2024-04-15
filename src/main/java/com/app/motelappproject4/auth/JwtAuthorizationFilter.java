@@ -36,7 +36,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
         try {
             String accessToken = jwtUtil.resolveToken(request);
             if (accessToken == null ) {
-                filterChain.doFilter(request, response);
+                String url = request.getRequestURL().toString();
+                System.out.println(url);
+                if(!url.contains("/rest/auth/")) {
+                    errorDetails.put("message", "You Need To Login");
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    mapper.writeValue(response.getWriter(), errorDetails);
+                }
+              filterChain.doFilter(request, response);
                 return;
             }
             Claims claims = jwtUtil.resolveClaims(request);

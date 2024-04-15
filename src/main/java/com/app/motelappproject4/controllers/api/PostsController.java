@@ -1,16 +1,24 @@
 // PostsController.java
 package com.app.motelappproject4.controllers.api;
 
+import com.app.motelappproject4.auth.JwtUntil;
 import com.app.motelappproject4.models.Post;
 import com.app.motelappproject4.models.PostRepository;
 import com.app.motelappproject4.models.User;
 import com.app.motelappproject4.models.UsersRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +26,8 @@ import java.util.concurrent.TimeUnit;
 public class PostsController {
     @Autowired
     private PostRepository postRepository;
-
+    @Autowired
+    private JwtUntil jwtUtil;
     @Autowired
     private UsersRepository usersRepository;
 
@@ -33,7 +42,18 @@ public class PostsController {
     }
 
     @PostMapping("/api/posts")
-    public Post create(@RequestBody Post post) {
+    public Post create(@RequestBody Post post, HttpServletRequest request) {
+
+        String accessToken = jwtUtil.resolveToken(request);
+        Claims claims = jwtUtil.resolveClaims(request);
+
+        Integer userId = claims.get("userid", Integer.class);
+        System.out.println(userId);
+
+        User u = usersRepository.findUserById(userId);
+        System.out.println("olala" + u);
+        post.setCreatedBy(u);
+
         return postRepository.save(post);
     }
 
