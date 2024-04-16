@@ -1,5 +1,6 @@
 package com.app.motelappproject4.controllers.api;
 
+import com.app.motelappproject4.dtos.DistrictCreateDTO;
 import com.app.motelappproject4.models.City;
 import com.app.motelappproject4.models.CityRepository;
 import com.app.motelappproject4.models.District;
@@ -16,6 +17,9 @@ import java.util.Optional;
 public class DistrictsController {
     @Autowired
     private DistrictsRepository districtsRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
 
     @GetMapping("/api/districts/{cityId}")
     public List<District> index(@PathVariable Integer cityId) {
@@ -34,8 +38,14 @@ public class DistrictsController {
     }
 
     @PostMapping("/api/districts")
-    public District create(@RequestBody District district) {
-        return districtsRepository.save(district);
+    public District create(@RequestBody DistrictCreateDTO district) {
+        District disAdd = new District();
+
+        disAdd.setName(district.getName());
+
+        City city = cityRepository.findById(district.getCity_id()).get();
+        disAdd.setCity(city);
+        return districtsRepository.save(disAdd);
     }
 
     @PutMapping("/api/districts/{id}")
@@ -60,10 +70,6 @@ public class DistrictsController {
         }
         return 0; // Failed to delete
     }
-
-    @Autowired
-    CityRepository cityRepository;
-
     @GetMapping("/api/seed/districts")
     public String seedDistrictsData() {
         Faker faker = new Faker();

@@ -31,9 +31,14 @@ public class PostsController {
     @Autowired
     private UsersRepository usersRepository;
 
-    @GetMapping("/api/posts")
-    public List<Post> index() {
-        return (List<Post>) postRepository.findAll();
+    @GetMapping("/api/myposts")
+    public List<Post> index(HttpServletRequest request) {
+        String accessToken = jwtUtil.resolveToken(request);
+        Claims claims = jwtUtil.resolveClaims(request);
+
+        Integer userId = claims.get("userid", Integer.class);
+        System.out.println(userId);
+        return (List<Post>) postRepository.getListPostFromCreatedBy(userId);
     }
 
     @GetMapping("/api/posts/{id}")
@@ -62,10 +67,15 @@ public class PostsController {
         Optional<Post> optionalPost = postRepository.findById(id);
         if (optionalPost.isPresent()) {
             Post existingPost = optionalPost.get();
-            // Update fields here
-            // For example: existingPost.setTitle(updatedPost.getTitle());
-            postRepository.save(existingPost);
-            return 1; // Success
+            existingPost.setContent(updatedPost.getContent());
+            try {
+                postRepository.save(existingPost);
+                return 1; // Success
+            }catch (Exception e){
+                System.out.println(e);
+                return 0;
+            }
+
         }
         return 0; // Failed to update
     }

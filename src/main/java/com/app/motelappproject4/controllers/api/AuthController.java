@@ -1,12 +1,16 @@
 package com.app.motelappproject4.controllers.api;
 
 import com.app.motelappproject4.auth.JwtUntil;
+import com.app.motelappproject4.models.Post;
+import com.app.motelappproject4.models.PostRepository;
 import com.app.motelappproject4.models.User;
 import com.app.motelappproject4.dtos.LoginReq;
 import com.app.motelappproject4.dtos.ErrorRes;
 import com.app.motelappproject4.dtos.LoginRes;
 import com.app.motelappproject4.models.UsersRepository;
 import com.app.motelappproject4.services.AuthService;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/rest/auth")
 public class AuthController {
@@ -27,6 +33,9 @@ public class AuthController {
     private JwtUntil jwtUntil;
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 //    private final AuthenticationManager authenticationManager;
 //    public AuthController(AuthenticationManager authenticationManager, JwtUntil jwtUtil) {
 //        this.authenticationManager = authenticationManager;
@@ -54,6 +63,11 @@ public class AuthController {
 //        System.out.println(loginReq.getEmail() + " " + loginReq.getPassword());
 //        return ResponseEntity.ok(loginReq);
 //    }
+
+    @GetMapping("/api/getAllPost")
+    public List<Post> index() {
+        return (List<Post>) postRepository.findAll();
+    }
 
     @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.POST)
