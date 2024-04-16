@@ -16,12 +16,12 @@ import java.util.Optional;
 @RestController
 public class DistrictsController {
     @Autowired
-    private DistrictsRepository districtsRepository;
+    DistrictsRepository districtsRepository;
 
     @Autowired
-    private CityRepository cityRepository;
+    CityRepository cityRepository;
 
-    @GetMapping("/api/districts/{cityId}")
+    @GetMapping("/api/districts/getList/{cityId}")
     public List<District> index(@PathVariable Integer cityId) {
         List<District> listDistrict = new ArrayList<District>();
         if(cityId == null){
@@ -32,7 +32,7 @@ public class DistrictsController {
         return listDistrict;
     }
 
-    @GetMapping("/api/districts/{id}")
+    @GetMapping("/api/districts/getById/{id}")
     public Optional<District> find(@PathVariable int id) {
         return districtsRepository.findById(id);
     }
