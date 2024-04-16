@@ -55,7 +55,6 @@ public class DistrictsController {
             District existingDistrict = optionalDistricts.get();
             existingDistrict.setName(updatedDistrict.getName());
             // Assuming you might also want to update the city relation
-            existingDistrict.setCity(updatedDistrict.getCity());
             districtsRepository.save(existingDistrict);
             return 1; // Success
         }
