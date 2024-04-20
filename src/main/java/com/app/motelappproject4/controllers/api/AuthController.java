@@ -1,13 +1,10 @@
 package com.app.motelappproject4.controllers.api;
 
 import com.app.motelappproject4.auth.JwtUntil;
-import com.app.motelappproject4.models.Post;
-import com.app.motelappproject4.models.PostRepository;
-import com.app.motelappproject4.models.User;
+import com.app.motelappproject4.models.*;
 import com.app.motelappproject4.dtos.LoginReq;
 import com.app.motelappproject4.dtos.ErrorRes;
 import com.app.motelappproject4.dtos.LoginRes;
-import com.app.motelappproject4.models.UsersRepository;
 import com.app.motelappproject4.services.AuthService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +30,9 @@ public class AuthController {
     private JwtUntil jwtUntil;
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private UserRoleRepository userRoleRepository;
 
     @Autowired
     private PostRepository postRepository;
@@ -81,12 +81,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Mật khẩu không chính xác");
         }
         var token = jwtUntil.createToken(user);
-        LoginRes loginRes = new LoginRes(user.getId(), user.getEmail(), token );
+
+        var role = userRoleRepository.findUserRoleByUser(user);
+        System.out.println(role);
+        LoginRes loginRes = new LoginRes(user.getId(), user.getEmail(), token, role.getRole().getName());
         return ResponseEntity.ok().body(loginRes);
     }
 
-    @RequestMapping(value = "/regis", method = RequestMethod.POST)
-    public ResponseEntity<?> create(@RequestBody User user) {
+    @RequestMapping(value = "/regis/{isOwner}", method = RequestMethod.POST)
+    public ResponseEntity<?> create(@RequestBody User user, @PathVariable boolean isOwner) {
         User userExist = usersRepository.findUserByEmail(user.getEmail());
         if (userExist != null) {
             return ResponseEntity.badRequest().body("Email đã tồn tại");
@@ -96,6 +99,19 @@ public class AuthController {
         user.setPassword(encodedPassword);
         try{
             usersRepository.save(user);
+
+            UserRole userRole = new UserRole();
+
+            userRole.setUser(user);
+
+            Role r = new Role();
+
+            r.setId(isOwner == true ? 2 : 3);
+
+            userRole.setRole(r);
+
+            userRoleRepository.save(userRole);
+
             return ResponseEntity.ok().body(user);
         }catch (Exception ex){
             return ResponseEntity.status(400).body(ex);

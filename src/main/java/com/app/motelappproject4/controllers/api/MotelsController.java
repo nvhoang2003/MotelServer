@@ -1,10 +1,11 @@
 // MotelController.java
 package com.app.motelappproject4.controllers.api;
 
-import com.app.motelappproject4.models.Motel;
-import com.app.motelappproject4.models.MotelRepository;
-import com.app.motelappproject4.models.User;
-import com.app.motelappproject4.models.UsersRepository;
+import com.app.motelappproject4.auth.JwtUntil;
+import com.app.motelappproject4.dtos.CreateMotelDTO;
+import com.app.motelappproject4.models.*;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +21,22 @@ public class MotelsController {
 
     @Autowired
     private UsersRepository usersRepository;
+    @Autowired
+    private JwtUntil jwtUntil;
 
     @GetMapping("/api/motels")
     public List<Motel> index() {
         return (List<Motel>) motelRepository.findAll();
+    }
+
+    @GetMapping("/api/myMotels")
+    public List<Motel> myMotels(HttpServletRequest request){
+        String accessToken = jwtUntil.resolveToken(request);
+        Claims claims = jwtUntil.resolveClaims(request);
+
+        Integer userId = claims.get("userid", Integer.class);
+        User u = usersRepository.findById(userId).get();
+        return (List<Motel>) motelRepository.findMotelByUser(u);
     }
 
     @GetMapping("/api/motels/{id}")
@@ -32,7 +45,9 @@ public class MotelsController {
     }
 
     @PostMapping("/api/motels")
-    public Motel create(@RequestBody Motel motel) {
+    public Motel create(@RequestBody CreateMotelDTO motel)
+    {
+
         return motelRepository.save(motel);
     }
 
