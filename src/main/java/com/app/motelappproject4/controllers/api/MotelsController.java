@@ -45,15 +45,15 @@ public class MotelsController {
         return ResponseEntity.ok(motels);
     }
 
-    @GetMapping("/api/myMotels")
-    public List<Motel> myMotels(HttpServletRequest request){
-        String accessToken = jwtUntil.resolveToken(request);
-        Claims claims = jwtUntil.resolveClaims(request);
-
-        Integer userId = claims.get("userid", Integer.class);
-        User u = usersRepository.findById(userId).get();
-        return (List<Motel>) motelRepository.findMotelByUser(u);
-    }
+//    @GetMapping("/api/myMotels")
+//    public List<Motel> myMotels(HttpServletRequest request){
+//        String accessToken = jwtUntil.resolveToken(request);
+//        Claims claims = jwtUntil.resolveClaims(request);
+//
+//        Integer userId = claims.get("userid", Integer.class);
+//        User u = usersRepository.findById(userId).get();
+//        return (List<Motel>) motelRepository.findMotelByUser(u);
+//    }
 
     @GetMapping("/api/motels/{id}")
     public ResponseEntity<Motel> find(@PathVariable int id) {
