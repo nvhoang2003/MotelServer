@@ -3,6 +3,12 @@ package com.app.motelappproject4.controllers.api;
 import com.app.motelappproject4.models.Like;
 import com.app.motelappproject4.models.Motel;
 import com.app.motelappproject4.models.MotelRepository;
+import com.app.motelappproject4.auth.JwtUntil;
+import com.app.motelappproject4.dtos.CreateMotelDTO;
+import com.app.motelappproject4.models.*;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
+import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +21,11 @@ import java.util.Optional;
 public class MotelsController {
     @Autowired
     private MotelRepository motelRepository;
+
+    @Autowired
+    private UsersRepository usersRepository;
+    @Autowired
+    private JwtUntil jwtUntil;
 
     @GetMapping("/api/motels")
     public ResponseEntity<List<Motel>> index() {
@@ -32,6 +43,16 @@ public class MotelsController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(motels);
+    }
+
+    @GetMapping("/api/myMotels")
+    public List<Motel> myMotels(HttpServletRequest request){
+        String accessToken = jwtUntil.resolveToken(request);
+        Claims claims = jwtUntil.resolveClaims(request);
+
+        Integer userId = claims.get("userid", Integer.class);
+        User u = usersRepository.findById(userId).get();
+        return (List<Motel>) motelRepository.findMotelByUser(u);
     }
 
     @GetMapping("/api/motels/{id}")

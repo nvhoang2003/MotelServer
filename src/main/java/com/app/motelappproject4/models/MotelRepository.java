@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MotelRepository extends CrudRepository<Motel, Integer> {
     List<Motel> getMotelsByCreatedBy_Id(int createdById);
+    Motel findMotelByUser(User u);
 }

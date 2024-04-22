@@ -2,14 +2,16 @@ package com.app.motelappproject4.dtos;
 
 public class LoginRes {
     private int id;
+    private String role;
     private String email;
     private String token;
 
     public LoginRes(){}
-    public LoginRes(int id,String email, String token) {
+    public LoginRes(int id,String email, String token, String role) {
         this.id = id;
         this.email = email;
         this.token = token;
+        this.role = role;
     }
 
 
@@ -36,5 +38,13 @@ public class LoginRes {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
