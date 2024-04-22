@@ -21,4 +21,7 @@ public class Tenant {
     @ManyToOne
     @JoinColumn(name = "motel_id")
     private Motel motel;
+
+    @Column(name = "status")
+    private String status;
 }
