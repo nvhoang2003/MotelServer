@@ -29,27 +29,27 @@ public class MotelsController {
         return (List<Motel>) motelRepository.findAll();
     }
 
-    @GetMapping("/api/myMotels")
-    public List<Motel> myMotels(HttpServletRequest request){
-        String accessToken = jwtUntil.resolveToken(request);
-        Claims claims = jwtUntil.resolveClaims(request);
-
-        Integer userId = claims.get("userid", Integer.class);
-        User u = usersRepository.findById(userId).get();
-        return (List<Motel>) motelRepository.findMotelByUser(u);
-    }
+//    @GetMapping("/api/myMotels")
+//    public List<Motel> myMotels(HttpServletRequest request){
+//        String accessToken = jwtUntil.resolveToken(request);
+//        Claims claims = jwtUntil.resolveClaims(request);
+//
+//        Integer userId = claims.get("userid", Integer.class);
+//        User u = usersRepository.findById(userId).get();
+//        return (List<Motel>) motelRepository.findMotelByUser(u);
+//    }
 
     @GetMapping("/api/motels/{id}")
     public Optional<Motel> find(@PathVariable int id) {
         return motelRepository.findById(id);
     }
 
-    @PostMapping("/api/motels")
-    public Motel create(@RequestBody CreateMotelDTO motel)
-    {
-
-        return motelRepository.save(motel);
-    }
+//    @PostMapping("/api/motels")
+//    public Motel create(@RequestBody CreateMotelDTO motel)
+//    {
+//
+//        return motelRepository.save(motel);
+//    }
 
     @PutMapping("/api/motels/{id}")
     public int update(@PathVariable int id, @RequestBody Motel updatedMotel) {
