@@ -6,7 +6,6 @@ import com.app.motelappproject4.models.UsersRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +52,6 @@ public class UsersController {
             existingUser.setEmail(updatedUser.getEmail());
             existingUser.setFirstName(updatedUser.getFirstName());
             existingUser.setLastName(updatedUser.getLastName());
-            // Add more fields as necessary
             User savedUser = usersRepository.save(existingUser);
             return ResponseEntity.ok(savedUser);
         }).orElseGet(() -> ResponseEntity.notFound().build());
