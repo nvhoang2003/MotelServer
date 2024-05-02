@@ -74,20 +74,21 @@ public class MotelsController {
         }
     }
 
-    @PutMapping("/api/motels/{id}")
+    @PostMapping("/api/motels/{id}/update")
     public ResponseEntity<Motel> update(@PathVariable int id, @RequestBody Motel updatedMotel) {
-        return motelRepository.findById(id).map(existingMotel -> {
-            // Cập nhật các thuộc tính của existingMotel từ updatedMotel
-            existingMotel.setAcreage(updatedMotel.getAcreage());
-            existingMotel.setAmount(updatedMotel.getAmount());
-            existingMotel.setDescription(updatedMotel.getDescription());
-            existingMotel.setStatus(updatedMotel.getStatus());
-            existingMotel.setDistrict(updatedMotel.getDistrict());
-            existingMotel.setIsDeleted(updatedMotel.getIsDeleted());
-            // Lưu lại đối tượng motel đã cập nhật
-            Motel savedMotel = motelRepository.save(existingMotel);
-            return ResponseEntity.ok(savedMotel);
-        }).orElse(ResponseEntity.notFound().build());
+        System.out.println("Update motel");
+        Optional<Motel> motelOptional = motelRepository.findById(id);
+        if (!motelOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        Motel motel = motelOptional.get();
+        motel.setAcreage(updatedMotel.getAcreage());
+        motel.setAmount(updatedMotel.getAmount());
+        motel.setDescription(updatedMotel.getDescription());
+        motel.setStatus(updatedMotel.getStatus());
+        motel.setIsDeleted(updatedMotel.getIsDeleted());
+        Motel savedMotel = motelRepository.save(motel);
+        return ResponseEntity.ok(savedMotel);
     }
 
     @DeleteMapping("/api/motels/{id}")
