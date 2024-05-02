@@ -1,10 +1,10 @@
 package com.app.motelappproject4.controllers.api;
-
 import com.app.motelappproject4.models.City;
 import com.app.motelappproject4.models.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -14,38 +14,47 @@ public class CityController {
     CityRepository cityRepository;
 
     @GetMapping("/api/city")
-    public List<City> index() {
-        return (List<City>) cityRepository.findAll();
+    public ResponseEntity<List<City>> index() {
+        List<City> cities = (List<City>) cityRepository.findAll();
+        return new ResponseEntity<>(cities, HttpStatus.OK);
     }
 
     @GetMapping("/api/city/{id}")
-    public Optional<City> find(@PathVariable int id) {
-        return cityRepository.findById(id);
+    public ResponseEntity<City> find(@PathVariable int id) {
+        Optional<City> optionalCity = cityRepository.findById(id);
+        if (optionalCity.isPresent()) {
+            return new ResponseEntity<>(optionalCity.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/api/city")
-    public City create(@RequestBody City city) {
-        return cityRepository.save(city);
+    public ResponseEntity<City> create(@RequestBody City city) {
+        City savedCity = cityRepository.save(city);
+        return new ResponseEntity<>(savedCity, HttpStatus.CREATED);
     }
 
     @PutMapping("/api/city/{id}")
-    public int update(@PathVariable int id, @RequestBody City city) {
+    public ResponseEntity<City> update(@PathVariable int id, @RequestBody City city) {
         Optional<City> optionalCity = cityRepository.findById(id);
         if (optionalCity.isPresent()) {
-            City updatedCity = optionalCity.get();
-            updatedCity.setName(city.getName());
-            cityRepository.save(updatedCity);
-            return 1;
+            City existingCity = optionalCity.get();
+            existingCity.setName(city.getName());
+            cityRepository.save(existingCity);
+            return new ResponseEntity<>(existingCity, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return 0;
     }
 
     @DeleteMapping("/api/city/{id}")
-    public int delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(@PathVariable int id) {
         if (cityRepository.existsById(id)) {
             cityRepository.deleteById(id);
-            return 1;
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return 0;
     }
 }

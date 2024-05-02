@@ -46,6 +46,13 @@ public class PaymentHistory {
 
     // Getters and setters
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
     public int getId() {
         return id;

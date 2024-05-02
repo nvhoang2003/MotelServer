@@ -6,15 +6,16 @@ import com.app.motelappproject4.models.User;
 import com.app.motelappproject4.models.UsersRepository;
 import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class CommentsController {
+
     @Autowired
     private CommentRepository commentRepository;
 
@@ -22,59 +23,47 @@ public class CommentsController {
     private UsersRepository usersRepository;
 
     @GetMapping("/api/comments")
-    public List<Comment> index() {
-        return (List<Comment>) commentRepository.findAll();
+    public ResponseEntity<List<Comment>> getAllComments() {
+        List<Comment> comments = (List<Comment>) commentRepository.findAll();
+        return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
     @GetMapping("/api/comments/{id}")
-    public Optional<Comment> find(@PathVariable int id) {
-        return commentRepository.findById(id);
+    public ResponseEntity<Comment> getCommentById(@PathVariable int id) {
+        Optional<Comment> optionalComment = commentRepository.findById(id);
+        if (optionalComment.isPresent()) {
+            return new ResponseEntity<>(optionalComment.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/api/comments")
-    public Comment create(@RequestBody Comment comment) {
-        return commentRepository.save(comment);
+    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
+        Comment savedComment = commentRepository.save(comment);
+        return new ResponseEntity<>(savedComment, HttpStatus.CREATED);
     }
 
     @PutMapping("/api/comments/{id}")
-    public int update(@PathVariable int id, @RequestBody Comment updatedComment) {
+    public ResponseEntity<Comment> updateComment(@PathVariable int id, @RequestBody Comment updatedComment) {
         Optional<Comment> optionalComment = commentRepository.findById(id);
         if (optionalComment.isPresent()) {
             Comment existingComment = optionalComment.get();
-            // Update fields here
-            // For example: existingComment.setContent(updatedComment.getContent());
+            existingComment.setContent(updatedComment.getContent());
             commentRepository.save(existingComment);
-            return 1; // Success
+            return new ResponseEntity<>(existingComment, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return 0; // Failed to update
     }
 
     @DeleteMapping("/api/comments/{id}")
-    public int delete(@PathVariable int id) {
+    public ResponseEntity<Void> deleteComment(@PathVariable int id) {
         if (commentRepository.existsById(id)) {
             commentRepository.deleteById(id);
-            return 1; // Success
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return 0; // Failed to delete
-    }
-
-    @GetMapping("/api/seed/comments")
-    public List<Comment> seedCommentsData() {
-        Faker faker = new Faker();
-        List<User> users = (List<User>) usersRepository.findAll();
-        List<Comment> list = new ArrayList<Comment>();
-        for (int i = 0; i < 10; i++) {
-            Comment comment = new Comment();
-            comment.setContent(faker.lorem().sentence());
-            comment.setCommentType(faker.lorem().word());
-            comment.setIsDeleted(faker.number().numberBetween(0, 1)); // Assuming 0: Not Deleted, 1: Deleted
-            if (!users.isEmpty()) {
-                comment.setCreatedBy(users.get(faker.number().numberBetween(0, users.size())));
-            }
-            commentRepository.save(comment);
-            list.add(comment);
-        }
-        commentRepository.saveAll(list);
-        return list;
     }
 }

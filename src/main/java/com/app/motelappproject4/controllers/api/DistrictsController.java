@@ -5,8 +5,9 @@ import com.app.motelappproject4.models.City;
 import com.app.motelappproject4.models.CityRepository;
 import com.app.motelappproject4.models.District;
 import com.app.motelappproject4.models.DistrictsRepository;
-import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -15,68 +16,84 @@ import java.util.Optional;
 
 @RestController
 public class DistrictsController {
-    @Autowired
-    DistrictsRepository districtsRepository;
 
     @Autowired
-    CityRepository cityRepository;
+    private DistrictsRepository districtsRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
 
     @GetMapping("/api/districts/getList/{cityId}")
-    public List<District> index(@PathVariable Integer cityId) {
-        List<District> listDistrict = new ArrayList<District>();
-        if(cityId == null){
+    public ResponseEntity<List<District>> getDistrictsByCityId(@PathVariable Integer cityId) {
+        List<District> listDistrict = new ArrayList<>();
+
+        if (cityId != null) {
+            listDistrict = districtsRepository.getListDistrictByCityId(cityId);
+        } else {
             listDistrict = (List<District>) districtsRepository.findAll();
-        }else{
-            listDistrict = (List<District>) districtsRepository.getListDistrictByCityId(cityId);
         }
-        return listDistrict;
+
+        return new ResponseEntity<>(listDistrict, HttpStatus.OK);
     }
 
     @GetMapping("/api/districts/getById/{id}")
-    public Optional<District> find(@PathVariable int id) {
-        return districtsRepository.findById(id);
+    public ResponseEntity<District> getDistrictById(@PathVariable int id) {
+        Optional<District> optionalDistrict = districtsRepository.findById(id);
+        if (optionalDistrict.isPresent()) {
+            return new ResponseEntity<>(optionalDistrict.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/api/districts")
-    public District create(@RequestBody DistrictCreateDTO district) {
+    public ResponseEntity<District> createDistrict(@RequestBody DistrictCreateDTO district) {
         District disAdd = new District();
-
         disAdd.setName(district.getName());
 
-        City city = cityRepository.findById(district.getCity_id()).get();
-        disAdd.setCity(city);
-        return districtsRepository.save(disAdd);
+        Optional<City> optionalCity = cityRepository.findById(district.getCity_id());
+        if (optionalCity.isPresent()) {
+            disAdd.setCity(optionalCity.get());
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // City ID not found
+        }
+
+        District savedDistrict = districtsRepository.save(disAdd);
+        return new ResponseEntity<>(savedDistrict, HttpStatus.CREATED);
     }
 
     @PutMapping("/api/districts/{id}")
-    public int update(@PathVariable int id, @RequestBody District updatedDistrict) {
-        Optional<District> optionalDistricts = districtsRepository.findById(id);
-        if (optionalDistricts.isPresent()) {
-            District existingDistrict = optionalDistricts.get();
+    public ResponseEntity<District> updateDistrict(@PathVariable int id, @RequestBody District updatedDistrict) {
+        Optional<District> optionalDistrict = districtsRepository.findById(id);
+        if (optionalDistrict.isPresent()) {
+            District existingDistrict = optionalDistrict.get();
             existingDistrict.setName(updatedDistrict.getName());
-            // Assuming you might also want to update the city relation
             districtsRepository.save(existingDistrict);
-            return 1; // Success
+            return new ResponseEntity<>(existingDistrict, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return 0; // Failed to update
     }
 
     @DeleteMapping("/api/districts/{id}")
-    public int delete(@PathVariable int id) {
+    public ResponseEntity<Void> deleteDistrict(@PathVariable int id) {
         if (districtsRepository.existsById(id)) {
             districtsRepository.deleteById(id);
-            return 1; // Success
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // District ID not found
         }
-        return 0; // Failed to delete
     }
 
-    // Test xem hàm đã hoạt động chuẩn chưa
     @GetMapping("/rest/auth/api/districts/city/{cityId}")
-    public List<District> getDistrictsByCityId(@PathVariable int cityId) {
-        return districtsRepository.getListDistrictByCityId(cityId);
+    public ResponseEntity<List<District>> getDistrictsByCityIdAuth(@PathVariable int cityId) {
+        List<District> districts = districtsRepository.getListDistrictByCityId(cityId);
+        return new ResponseEntity<>(districts, HttpStatus.OK);
     }
+
     @GetMapping("/rest/auth/api/districts/city")
-    public List<District> getDistrictsByCityId() {
-        return districtsRepository.getListDistrictByCityId();
+    public ResponseEntity<List<District>> getAllDistrictsAuth() {
+        List<District> districts = districtsRepository.getListDistrictByCityId();
+        return new ResponseEntity<>(districts, HttpStatus.OK);
     }
 }
