@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "permission")
 public class Permission {

@@ -1,9 +1,6 @@
 package com.app.motelappproject4.controllers.api;
 
-import com.app.motelappproject4.models.Post;
-import com.app.motelappproject4.models.PostRepository;
-import com.app.motelappproject4.models.User;
-import com.app.motelappproject4.models.UsersRepository;
+import com.app.motelappproject4.models.*;
 import com.app.motelappproject4.auth.JwtUntil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +22,7 @@ public class PostsController {
     @Autowired
     private UsersRepository usersRepository;
 
-    // GET all posts by a user
+    // GET all posts by a user created by
     @GetMapping("/myposts")
     public List<Post> index(HttpServletRequest request) {
         String accessToken = jwtUtil.resolveToken(request);
@@ -33,6 +30,13 @@ public class PostsController {
         Integer userId = claims.get("userid", Integer.class);
         System.out.println(userId);
         return (List<Post>) postRepository.getListPostFromCreatedBy(userId);
+    }
+
+    // GET all posts
+    @GetMapping
+    public ResponseEntity<List<Post>> getAllPost() {
+        List<Post> posts = (List<Post>) postRepository.findAll();
+        return ResponseEntity.ok(posts);
     }
 
     // GET a single post by ID
@@ -60,16 +64,14 @@ public class PostsController {
     // PUT update a post
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable int id, @RequestBody Post updatedPost) {
-        return postRepository.findById(id)
-                .map(existingPost -> {
-                    existingPost.setTitle(updatedPost.getTitle());
-                    existingPost.setContent(updatedPost.getContent());
-                    existingPost.setStatus(updatedPost.getStatus());
-                    existingPost.setIsDeleted(updatedPost.getIsDeleted());
-                    Post savedPost = postRepository.save(existingPost);
-                    return ResponseEntity.ok(savedPost);
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return postRepository.findById(id).map(existingPost -> {
+            existingPost.setTitle(updatedPost.getTitle());
+            existingPost.setContent(updatedPost.getContent());
+            existingPost.setStatus(updatedPost.getStatus());
+            existingPost.setIsDeleted(updatedPost.getIsDeleted());
+            Post savedPost = postRepository.save(existingPost);
+            return ResponseEntity.ok(savedPost);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // DELETE a post
