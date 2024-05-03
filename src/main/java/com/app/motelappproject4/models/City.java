@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 
 import java.util.List;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "city")
 public class City {

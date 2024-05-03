@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "users")
 public class User {
@@ -64,6 +63,7 @@ public class User {
 
 
     // Getters and setters
+
     public int getId() {
         return id;
     }

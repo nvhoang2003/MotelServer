@@ -1,28 +1,19 @@
-// PostsController.java
 package com.app.motelappproject4.controllers.api;
 
+import com.app.motelappproject4.models.*;
 import com.app.motelappproject4.auth.JwtUntil;
-import com.app.motelappproject4.models.Post;
-import com.app.motelappproject4.models.PostRepository;
-import com.app.motelappproject4.models.User;
-import com.app.motelappproject4.models.UsersRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @RestController
+@RequestMapping("/api/posts")
 public class PostsController {
     @Autowired
     private PostRepository postRepository;
@@ -31,81 +22,65 @@ public class PostsController {
     @Autowired
     private UsersRepository usersRepository;
 
-    @GetMapping("/api/myposts")
+    // GET all posts by a user created by
+    @GetMapping("/myposts")
     public List<Post> index(HttpServletRequest request) {
         String accessToken = jwtUtil.resolveToken(request);
         Claims claims = jwtUtil.resolveClaims(request);
-
         Integer userId = claims.get("userid", Integer.class);
         System.out.println(userId);
         return (List<Post>) postRepository.getListPostFromCreatedBy(userId);
     }
 
-    @GetMapping("/api/posts/{id}")
-    public Optional<Post> find(@PathVariable int id) {
-        return postRepository.findById(id);
+    // GET all posts
+    @GetMapping
+    public ResponseEntity<List<Post>> getAllPost() {
+        List<Post> posts = (List<Post>) postRepository.findAll();
+        return ResponseEntity.ok(posts);
     }
 
-    @PostMapping("/api/posts")
-    public Post create(@RequestBody Post post, HttpServletRequest request) {
+    // GET a single post by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Post> getPostById(@PathVariable int id) {
+        Optional<Post> post = postRepository.findById(id);
+        return post.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
+    // POST a new post
+    @PostMapping
+    public ResponseEntity<Post> createPost(@RequestBody Post post, HttpServletRequest request) {
         String accessToken = jwtUtil.resolveToken(request);
         Claims claims = jwtUtil.resolveClaims(request);
-
         Integer userId = claims.get("userid", Integer.class);
-        System.out.println(userId);
-
-        User u = usersRepository.findUserById(userId);
-        System.out.println("olala" + u);
-        post.setCreatedBy(u);
-
-        return postRepository.save(post);
-    }
-
-    @PutMapping("/api/posts/{id}")
-    public int update(@PathVariable int id, @RequestBody Post updatedPost) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        if (optionalPost.isPresent()) {
-            Post existingPost = optionalPost.get();
-            existingPost.setContent(updatedPost.getContent());
-            try {
-                postRepository.save(existingPost);
-                return 1; // Success
-            }catch (Exception e){
-                System.out.println(e);
-                return 0;
-            }
-
+        User user = usersRepository.findById(userId).orElse(null);
+        if (user != null) {
+            post.setCreatedBy(user);
+            Post savedPost = postRepository.save(post);
+            return new ResponseEntity<>(savedPost, HttpStatus.CREATED);
         }
-        return 0; // Failed to update
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @DeleteMapping("/api/posts/{id}")
-    public int delete(@PathVariable int id) {
+    // PUT update a post
+    @PutMapping("/{id}")
+    public ResponseEntity<Post> updatePost(@PathVariable int id, @RequestBody Post updatedPost) {
+        return postRepository.findById(id).map(existingPost -> {
+            existingPost.setTitle(updatedPost.getTitle());
+            existingPost.setContent(updatedPost.getContent());
+            existingPost.setStatus(updatedPost.getStatus());
+            existingPost.setIsDeleted(updatedPost.getIsDeleted());
+            Post savedPost = postRepository.save(existingPost);
+            return ResponseEntity.ok(savedPost);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // DELETE a post
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable int id) {
         if (postRepository.existsById(id)) {
             postRepository.deleteById(id);
-            return 1; // Success
+            return ResponseEntity.ok().build();
         }
-        return 0; // Failed to delete
-    }
-
-    @GetMapping("/api/seed/posts")
-    public List<Post> seedPostsData() {
-        Faker faker = new Faker();
-        List<User> users = (List<User>) usersRepository.findAll();
-        List<Post> list = new ArrayList<Post>();
-        for (int i = 0; i < 10; i++) {
-            Post post = new Post();
-            post.setTitle(faker.lorem().sentence());
-            post.setContent(faker.lorem().paragraph());
-            post.setStatus(faker.lorem().word());
-            post.setIsDeleted(faker.number().numberBetween(0, 1)); // Assuming 0: Not Deleted, 1: Deleted
-            if (!users.isEmpty()) {
-                post.setCreatedBy(users.get(faker.number().numberBetween(0, users.size())));
-            }
-            list.add(post);
-        }
-        postRepository.saveAll(list);
-        return list;
+        return ResponseEntity.notFound().build();
     }
 }

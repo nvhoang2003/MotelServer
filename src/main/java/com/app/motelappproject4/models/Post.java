@@ -8,7 +8,6 @@ import org.w3c.dom.ls.LSException;
 
 import java.util.List;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -38,6 +37,14 @@ public class Post {
     private District district;
 
     // Get and Set
+
+    public District getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(District district) {
+        this.district = district;
+    }
 
     public int getId() {
         return id;
