@@ -1,6 +1,7 @@
 package com.app.motelappproject4.controllers.api;
 
 import com.app.motelappproject4.auth.JwtUntil;
+import com.app.motelappproject4.dtos.DistrictCreateDTO;
 import com.app.motelappproject4.models.*;
 import com.app.motelappproject4.dtos.LoginReq;
 import com.app.motelappproject4.dtos.ErrorRes;
@@ -20,7 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/rest/auth")
@@ -36,6 +39,12 @@ public class AuthController {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
+
+    @Autowired
+    private DistrictsRepository districtsRepository;
 //    private final AuthenticationManager authenticationManager;
 //    public AuthController(AuthenticationManager authenticationManager, JwtUntil jwtUtil) {
 //        this.authenticationManager = authenticationManager;
@@ -64,9 +73,16 @@ public class AuthController {
 //        return ResponseEntity.ok(loginReq);
 //    }
 
-    @GetMapping("/api/getAllPost")
-    public List<Post> index() {
-        return (List<Post>) postRepository.findAll();
+    @GetMapping("/api/city")
+    public ResponseEntity<List<City>> indexCity() {
+        List<City> cities = (List<City>) cityRepository.findAll();
+        return new ResponseEntity<>(cities, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/posts")
+    public ResponseEntity<List<Post>> indexPosts() {
+        List<Post> posts = (List<Post>) postRepository.findAll();
+        return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @ResponseBody
