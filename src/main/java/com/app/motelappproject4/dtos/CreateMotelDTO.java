@@ -1,57 +1,56 @@
 package com.app.motelappproject4.dtos;
 
+import com.app.motelappproject4.models.User;
+
 public class CreateMotelDTO {
-    public int accegrate;
-    public double amount;
-    public String description;
-    public String status;
-    public int districtId;
+    private int amount;
+    private int acreage;
+    private String description;
+    private String emailTenant;
 
-    public CreateMotelDTO(int accegrate, double amount, String description, String status, int districtId) {
-        this.accegrate = accegrate;
-        this.amount = amount;
-        this.description = description;
-        this.status = status;
-        this.districtId = districtId;
+    private User createdBy;
+    // Getter Methods
+
+
+    public User getCreatedBy() {
+        return createdBy;
     }
 
-    public int getAccegrate() {
-        return accegrate;
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public void setAccegrate(int accegrate) {
-        this.accegrate = accegrate;
-    }
-
-    public double getAmount() {
+    public int getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public int getAcreage() {
+        return acreage;
     }
 
     public String getDescription() {
         return description;
     }
 
+    public String getEmailTenant() {
+        return emailTenant;
+    }
+
+    // Setter Methods
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public void setAcreage(int acreage) {
+        this.acreage = acreage;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getDistrictId() {
-        return districtId;
-    }
-
-    public void setDistrictId(int districtId) {
-        this.districtId = districtId;
+    public void setEmailTenant(String emailTenant) {
+        this.emailTenant = emailTenant;
     }
 }

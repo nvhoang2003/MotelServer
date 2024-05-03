@@ -69,23 +69,6 @@ public class DistrictsController {
         }
         return 0; // Failed to delete
     }
-    @GetMapping("/api/seed/districts")
-    public String seedDistrictsData() {
-        Faker faker = new Faker();
-        List<City> cities = (List<City>) cityRepository.findAll(); // Giả sử bạn đã có cityRepository
-        if (cities.isEmpty()) {
-            return "Please seed cities first.";
-        }
-        for (int i = 0; i < 10; i++) {
-            District district = new District();
-            district.setName(faker.address().cityName());
-            // Lấy ngẫu nhiên một City từ danh sách
-            City city = cities.get(faker.number().numberBetween(0, cities.size()));
-            district.setCity(city); // Thiết lập mối quan hệ với City
-            districtsRepository.save(district);
-        }
-        return "Seeded districts data with city associations";
-    }
 
     // Test xem hàm đã hoạt động chuẩn chưa
     @GetMapping("/rest/auth/api/districts/city/{cityId}")

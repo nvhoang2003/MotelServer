@@ -23,9 +23,12 @@ public class PaymentHistory {
     @Column(name = "water_money")
     private Integer waterMoney;
 
+    @Column(name = "state")
+    private String state;
+
     @ManyToOne
     @JoinColumn(name = "motel_id")
-    private Motel  motel;
+    private Motel motel;
 
     @Column(name = "wifi_money")
     private Integer wifiMoney;
