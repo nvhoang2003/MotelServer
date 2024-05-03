@@ -7,6 +7,7 @@ import com.app.motelappproject4.auth.JwtUntil;
 import com.app.motelappproject4.models.*;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -97,7 +98,7 @@ public class MotelsController {
     }
 
     @PostMapping("/api/motels")
-    public ResponseEntity<Motel> create(@RequestBody CreateMotelDTO motelToAdd) {
+    public ResponseEntity<String> create(@RequestBody CreateMotelDTO motelToAdd) {
         try {
             Motel motel = new Motel();
 
@@ -105,65 +106,81 @@ public class MotelsController {
             motel.setAcreage(motelToAdd.getAcreage());
             motel.setDescription(motelToAdd.getDescription());
             motel.setCreatedBy(motelToAdd.getCreatedBy());
-            Motel savedMotel = motelRepository.save(motel);
-
-            Tenant tenant = new Tenant();
-
             var emailTenant = motelToAdd.getEmailTenant();
             List<String> listTeant = Arrays.stream(emailTenant.split(",")).toList();
-
+            List<Tenant> lt = new ArrayList<>();
             listTeant.forEach(oneTenant -> {
                 var user = usersRepository.findUserByEmail(oneTenant.trim());
                 if(user != null) {
                     Tenant t = new Tenant();
                     t.setUser(user);
-                    t.setMotel(savedMotel);
 
-                    Tenant tSave = tenantRepository.save(t);
+                    lt.add(t);
+                }else{
+                    throw new RuntimeException("Email " + oneTenant + " Bị Sai");
                 }
             });
 
-            return ResponseEntity.status(201).body(savedMotel);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            Motel savedMotel = motelRepository.save(motel);
+            lt.forEach(t ->{
+                t.setMotel(savedMotel);
+                Tenant tSave = tenantRepository.save(t);
+            });
+
+            return ResponseEntity.status(201).body("Ok");
+        } catch (RuntimeException e) {
+            // Khi có lỗi xảy ra, Spring sẽ tự động rollback lại tất cả các thay đổi trong database
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/api/motels/{id}")
-    public ResponseEntity<Motel> update(@PathVariable int id, @RequestBody CreateMotelDTO updatedMotel) {
-        var existingMotelObj = motelRepository.findById(id);
+    public ResponseEntity<String> update(@PathVariable int id, @RequestBody CreateMotelDTO updatedMotel) {
+        try{
+            var existingMotelObj = motelRepository.findById(id).get();
 
-        var deleteTenants = tenantRepository.getTenantsByMotel(existingMotelObj.get());
+            var deleteTenants = tenantRepository.getTenantsByMotel(existingMotelObj);
 
-        deleteTenants.forEach(tenant -> {
-            tenantRepository.deleteById(tenant.getId());
-        });
+            var emailTenant = updatedMotel.getEmailTenant();
+            List<String> listTeant = Arrays.stream(emailTenant.split(",")).toList();
+            List<Tenant> lt = new ArrayList<>();
+            listTeant.forEach(oneTenant -> {
+                var user = usersRepository.findUserByEmail(oneTenant.trim());
+                if(user != null) {
+                    Tenant t = new Tenant();
+                    t.setUser(user);
 
-        var emailTenant = updatedMotel.getEmailTenant();
-        List<String> listTeant = Arrays.stream(emailTenant.split(",")).toList();
+                    lt.add(t);
+                }else{
+                    throw new RuntimeException("Email " + oneTenant + " Bị Sai");
+                }
+            });
 
-        listTeant.forEach(oneTenant -> {
-            var user = usersRepository.findUserByEmail(oneTenant.trim());
-            if(user != null) {
-                Tenant t = new Tenant();
-                t.setUser(user);
-                t.setMotel(existingMotelObj.get());
+            lt.forEach(t -> {
+                t.setMotel(existingMotelObj);
 
                 Tenant tSave = tenantRepository.save(t);
-            }
-        });
+            });
 
-        return existingMotelObj.map(existingMotel -> {
-            // Cập nhật các thuộc tính của existingMotel từ updatedMotel
-            existingMotel.setAcreage(updatedMotel.getAcreage());
-            existingMotel.setAmount(updatedMotel.getAmount());
-            existingMotel.setDescription(updatedMotel.getDescription());
+            deleteTenants.forEach(tenant -> {
+                tenantRepository.deleteById(tenant.getId());
+            });
 
-            // Lưu lại đối tượng motel đã cập nhật
-            Motel savedMotel = motelRepository.save(existingMotel);
-            return ResponseEntity.ok(savedMotel);
-        }).orElse(ResponseEntity.notFound().build());
+                // Cập nhật các thuộc tính của existingMotel từ updatedMotel
+            existingMotelObj.setAcreage(updatedMotel.getAcreage());
+            existingMotelObj.setAmount(updatedMotel.getAmount());
+            existingMotelObj.setDescription(updatedMotel.getDescription());
+
+                // Lưu lại đối tượng motel đã cập nhật
+            Motel savedMotel = motelRepository.save(existingMotelObj);
+
+            return ResponseEntity.ok("Ok");
+
+        }catch(RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
 
     @DeleteMapping("/api/motels/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
