@@ -23,6 +23,12 @@ public class PaymentHistoriesController {
         return ResponseEntity.ok(paymentHistories);
     }
 
+    @GetMapping("/api/paymentHistories/owner/{id}")
+    public ResponseEntity<List<PaymentHistory>> getPaymentHistoriesByCreatedBy_Id(@PathVariable int id) {
+        List<PaymentHistory> paymentHistories = (List<PaymentHistory>) paymentHistoryRepository.getPaymentHistoriesByCreatedBy_Id(id);
+        return ResponseEntity.ok(paymentHistories);
+    }
+
     // Lấy lịch sử thanh toán theo ID
     @GetMapping("/api/paymentHistories/{id}")
     public ResponseEntity<PaymentHistory> getPaymentHistoryById(@PathVariable int id) {
