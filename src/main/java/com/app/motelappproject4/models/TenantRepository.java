@@ -10,4 +10,6 @@ public interface TenantRepository extends CrudRepository<Tenant, Integer> {
     List<Tenant> getTenantsByUser(User user);
 
     List<Tenant> getTenantsByMotel_Id(int motel_id);
+
+    List<Tenant> getTenantsByUser_Id(int User_Id);
 }

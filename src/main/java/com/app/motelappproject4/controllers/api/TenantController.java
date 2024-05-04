@@ -24,6 +24,12 @@ public class TenantController {
         return ResponseEntity.ok(tenants);
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<Tenant>> getTenantsByUser_Id(@PathVariable int id) {
+        List<Tenant> tenants = (List<Tenant>) tenantRepository.getTenantsByUser_Id(id);
+        return ResponseEntity.ok(tenants);
+    }
+
     @GetMapping("/motel/{id}")
     public ResponseEntity<List<Tenant>> getAllTenantsByMotel_Id(@PathVariable int id) {
         List<Tenant> tenants = (List<Tenant>) tenantRepository.getTenantsByMotel_Id(id);
